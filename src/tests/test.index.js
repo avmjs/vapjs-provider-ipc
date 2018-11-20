@@ -1,4 +1,4 @@
-const HttpProvider = require('../index.js'); // eslint-disable-line
+const IpcProvider = require('../index.js'); // eslint-disable-line
 const TestRPC = require('ethereumjs-testrpc'); // eslint-disable-line
 const Eth = require('ethjs-query'); // eslint-disable-line
 const EthQuery = require('eth-query');
@@ -8,98 +8,103 @@ const SandboxedModule = require('sandboxed-module');
 const server = TestRPC.server();
 server.listen(5002);
 
-function FakeXHR2() {
-  const self = this;
-  self.responseText = '{}';
-  self.readyState = 4;
-  self.onreadystatechange = null;
-  self.async = true;
-  self.headers = {
-    'Content-Type': 'text/plain',
-  };
+const net = require('net');
+const http = require('http');
+
+const socketServer = net.createServer(socket => {
+  socket.on('data', data => {
+    const request = data.toString('utf8');
+
+    const httprequest = http.request({ method: 'post', port: 5002, path: '/' }, response => {
+      let body = '';
+      response.on('data', d => {
+        body += d;
+      });
+      response.on('end', () => {
+        socket.write(body);
+      });
+      response.on('error', (e) => {
+        console.error(`problem with request: ${e.message}`); // eslint-disable-line
+      });
+    });
+    httprequest.write(request);
+    httprequest.end();
+  });
+
+  socket.on('close', () => {
+    socket.end();
+    socket.destroy();
+  });
+});
+
+socketServer.listen('/tmp/out.ipc');
+after(() => socketServer.close());
+
+function FakeNet() {
 }
 
-FakeXHR2.prototype.open = function(method, host) { // eslint-disable-line
+FakeNet.connect = function(path) { // eslint-disable-line
   const self = this;
-  assert.equal(method, 'POST');
-  assert.notEqual(host, null);
-  self.async = true;
+  self.path = path;
+  return self;
 };
 
-FakeXHR2.prototype.setRequestHeader = function(name, value) { // eslint-disable-line
-  const self = this;
-  self.headers[name] = value;
-};
-
-FakeXHR2.prototype.send = function (payload) { // eslint-disable-line
-  const self = this;
+FakeNet.write = function (payload) { // eslint-disable-line
   const payloadParsed = JSON.parse(payload);
 
   if (payloadParsed.forceTimeout === true) {
-    setTimeout(() => {
-      self.ontimeout();
-    }, 2000);
+    netCallbacks.error(new Error('Timeout reached'));
   } else if (payloadParsed.invalidSend === true) {
-    throw new Error('invalid data!!!');
+    netCallbacks.error(new Error('Invalid data sent'));
   } else if (payloadParsed.invalidJSON === true) {
-    self.responseText = 'dsfsfd{sdf}';
-    self.onreadystatechange();
+    netCallbacks.error(new Error('Invalid JSON'));
   } else {
-    assert.equal(typeof self.onreadystatechange, 'function');
-    self.onreadystatechange();
+    netCallbacks.data(payload);
   }
 };
 
+const netCallbacks = {};
+FakeNet.on = function(type, callback) { // eslint-disable-line
+  netCallbacks[type] = callback;
+};
+
 SandboxedModule.registerBuiltInSourceTransformer('istanbul');
-const FakeHttpProvider = SandboxedModule.require('../index.js', {
+const FakeIpcProvider = SandboxedModule.require('../index.js', {
   requires: {
-    xhr2: FakeXHR2,
+    net: FakeNet,
   },
   singleOnly: true,
 });
 
-describe('HttpProvider', () => {
+describe('IpcProvider', () => {
   describe('constructor', () => {
     it('should throw under invalid conditions', () => {
-      assert.throws(() => HttpProvider(''), Error); // eslint-disable-line
-      assert.throws(() => new HttpProvider({}, 3932), Error); // eslint-disable-line
+      assert.throws(() => IpcProvider(''), Error); // eslint-disable-line
+      assert.throws(() => new IpcProvider({}), Error); // eslint-disable-line
     });
 
     it('should construct normally under valid conditions', () => {
-      const provider = new HttpProvider('http://localhost:8545');
-      assert.equal(provider.host, 'http://localhost:8545');
-      assert.equal(provider.timeout, 0);
-    });
-
-    it('should construct normally under valid conditions', () => {
-      const provider = new HttpProvider('http://localhost:8545', 10);
-      assert.equal(provider.host, 'http://localhost:8545');
-      assert.equal(provider.timeout, 10);
-    });
-
-    it('should construct normally under valid conditions', () => {
-      const provider = new HttpProvider('http://localhost:5002', 10);
-      assert.equal(provider.host, 'http://localhost:5002');
-      assert.equal(provider.timeout, 10);
+      const provider = new IpcProvider('/tmp/out2.ipc');
+      assert.equal(provider.path, '/tmp/out2.ipc');
     });
 
     it('should throw error with no new', () => {
       function invalidProvider() {
-        HttpProvider('http://localhost:8545', 10); // eslint-disable-line
+        IpcProvider('/tmp/out2.ipc'); // eslint-disable-line
       }
       assert.throws(invalidProvider, Error);
     });
 
     it('should throw error with no provider', () => {
       function invalidProvider() {
-        new HttpProvider(); // eslint-disable-line
+        new IpcProvider(); // eslint-disable-line
       }
       assert.throws(invalidProvider, Error);
     });
   });
 
   describe('test against ethjs-query', () => {
-    const eth = new Eth(new HttpProvider('http://localhost:5002')); // eslint-disable-line
+    const eth = new Eth(new IpcProvider('/tmp/out.ipc')); // eslint-disable-line
 
     it('should get accounts', (done) => {
       eth.accounts((accountsError, accountsResult) => {
@@ -144,7 +149,7 @@ describe('HttpProvider', () => {
   });
 
   describe('test against eth-query', () => {
-    const query = new EthQuery(new HttpProvider('http://localhost:5002')); // eslint-disable-line
+    const query = new EthQuery(new IpcProvider('/tmp/out.ipc')); // eslint-disable-line
 
     it('should get accounts', (done) => {
       query.accounts((accountsError, accountsResult) => {
@@ -187,14 +192,13 @@ describe('HttpProvider', () => {
   });
 
   describe('test against web3', () => {
-    const web3 = new Web3(new HttpProvider('http://localhost:5002')); // eslint-disable-line
+    const web3 = new Web3(new IpcProvider('/tmp/out.ipc')); // eslint-disable-line
 
-    it('should get accounts', (done) => {
+    it('should get accounts WEB3', (done) => {
       web3.eth.getAccounts((accountsError, accountsResult) => {
         assert.equal(accountsError, null);
         assert.equal(typeof accountsResult, 'object');
         assert.equal(Array.isArray(accountsResult), true);
-
         done();
       });
     });
@@ -238,11 +242,11 @@ describe('HttpProvider', () => {
   describe('web3 FakeProvider', () => {
     describe('sendAsync timeout', () => {
       it('should send basic async request and timeout', (done) => {
-        const provider = new FakeHttpProvider('http://localhost:5002', 2);
+        const provider = new FakeIpcProvider('/tmp/out.ipc');
 
-        provider.sendAsync({ forceTimeout: true }, (err, result) => {
-          assert.equal(typeof err, 'string');
-          assert.equal(typeof result, 'object');
+        provider.sendAsync({ forceTimeout: true, id: 234 }, (err, result) => {
+          assert.equal(typeof err, 'object');
+          assert.equal(result, null);
           done();
         });
       });
@@ -250,20 +254,20 @@ describe('HttpProvider', () => {
 
     describe('invalid payload', () => {
       it('should throw an error as its not proper json', (done) => {
-        const provider = new FakeHttpProvider('http://localhost:5002');
+        const provider = new FakeIpcProvider('/tmp/out.ipc');
 
         provider.sendAsync('sdfsds{}{df()', (err, result) => {
-          assert.equal(typeof err, 'string');
+          assert.equal(typeof err, 'object');
           assert.equal(typeof result, 'object');
           done();
         });
       });
 
       it('should throw an error as its not proper json', (done) => {
-        const provider = new FakeHttpProvider('http://localhost:5002');
+        const provider = new FakeIpcProvider('/tmp/out.ipc');
 
-        provider.sendAsync({ invalidSend: true }, (err, result) => {
-          assert.equal(typeof err, 'string');
+        provider.sendAsync({ invalidSend: true, id: 333 }, (err, result) => {
+          assert.equal(typeof err, 'object');
           assert.equal(typeof result, 'object');
           done();
         });
@@ -272,11 +276,10 @@ describe('HttpProvider', () => {
 
     describe('sendAsync timeout', () => {
       it('should send basic async request and timeout', (done) => {
-        const provider = new FakeHttpProvider('http://localhost:5002', 2);
-
-        provider.sendAsync({ invalidJSON: true }, (err, result) => {
+        const provider = new FakeIpcProvider('/tmp/out.ipc');
+        provider.sendAsync({ forceTimeout: true, id: 85 }, (err, result) => {
           assert.equal(typeof err, 'object');
-          assert.equal(typeof result, 'string');
+          assert.equal(result, null);
           done();
         });
       });
@@ -284,9 +287,9 @@ describe('HttpProvider', () => {
 
     describe('sendAsync', () => {
       it('should send basic async request', (done) => {
-        const provider = new FakeHttpProvider('http://localhost:5002');
+        const provider = new FakeIpcProvider('/tmp/out.ipc');
 
-        provider.sendAsync({}, (err, result) => {
+        provider.sendAsync({ id: 346 }, (err, result) => {
           assert.equal(typeof result, 'object');
           done();
         });

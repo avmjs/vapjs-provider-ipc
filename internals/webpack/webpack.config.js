@@ -2,8 +2,8 @@ var webpack = require('webpack'); // eslint-disable-line
 var path = require('path');   // eslint-disable-line
 
 var env = process.env.NODE_ENV;   // eslint-disable-line
-var filename = 'ethjs-provider-http';      // eslint-disable-line
-var library = 'HttpProvider';          // eslint-disable-line
+var filename = 'ethjs-provider-ipc';      // eslint-disable-line
+var library = 'IpcProvider';          // eslint-disable-line
 var config = {                    // eslint-disable-line
   entry: [
     path.resolve('./lib/index.js'),
@@ -36,6 +36,7 @@ var config = {                    // eslint-disable-line
       'process.env.NODE_ENV': JSON.stringify(env),
     }),
   ],
+  target: 'node',
 };
 
 if (env === 'production') {

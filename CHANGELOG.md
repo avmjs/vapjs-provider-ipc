@@ -1,10 +1,3 @@
-# 0.1.3 -- config fix
-
-1. Config fix
-2. More docs
-
-# 0.0.1 -- ethjs-provider-http
-
-1. Basic testing
-2. Basic docs
-3. License
+# 0.0.1 -- ethjs-provider-ipc
+1. Copied and adapted from ethjs-provider-http
+2. Added a proxy to test with TestRPC through a unix socket

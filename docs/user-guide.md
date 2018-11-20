@@ -1,19 +1,19 @@
 # User Guide
 
-All information for developers using `ethjs-provider-http` should consult this document.
+All information for developers using `ethjs-provider-ipc` should consult this document.
 
 ## Install
 
 ```
-npm install --save ethjs-provider-http
+npm install --save ethjs-provider-ipc
 ```
 
 ## Usage
 
 ```js
-const HttpProvider = require('ethjs-provider-http');
+const IpcProvider = require('ethjs-provider-ipc');
 const Eth = require('ethjs-query');
-const eth = new Eth(new HttpProvider('https://ropsten.infura.io'));
+const eth = new Eth(new IpcProvider('/var/run/geth.ipc'));
 
 eth.getBlockByNumber(45039930, cb);
 
@@ -25,42 +25,25 @@ eth.getBlockByNumber(45039930, cb);
 
 ### constructor
 
-[index.js:ethjs-provider-http](../../../blob/master/src/index.js "Source code on GitHub")
+[index.js:ethjs-provider-ipc](../../../blob/master/src/index.js "Source code on GitHub")
 
-Intakes a `provider` URL specified as a string, and optionally the `timeout` specified as a Number, outputs a web3 standard `HttpProvider` object.
+Intakes a `provider` path specified as a string, outputs a web3 standard `IpcProvider` object.
 
 **Parameters**
 
--   `provider` **String** the URL path to your local Http RPC enabled Ethereum node (e.g. `http://localhost:8545`) or a service node system like [Infura.io](http://infura.io) (e.g. `http://ropsten.infura.io`).
--   `timeout` **Number** [optional] the time in seconds that an XHR2 request will wait until it times out.
+-   `provider` **String** the path to your local unis socket RPC enabled Ethereum node (e.g. `/var/run/geth.ipc`).
 
-Result `HttpProvider` **Object**.
+Result `IpcProvider` **Object**.
 
 ```js
-const HttpProvider = require('ethjs-provider-http');
+const IpcProvider = require('ethjs-provider-ipc');
 const Eth = require('ethjs-query');
-const eth = new Eth(new HttpProvider('http://localhost:8545'));
+const eth = new Eth(new IpcProvider('/var/run/geth.ipc'));
 
 eth.accounts((err, result) => {
   // result null ['0xd89b8a74c153f0626497bc4a531f702...', ...]
 });
 ```
-
-## Browser Builds
-
-`ethjs` provides production distributions for all of its modules that are ready for use in the browser right away. Simply include either `dist/ethjs-provider-http.js` or `dist/ethjs-provider-http.min.js` directly into an HTML file to start using this module. Note, an `HttpProvider` object is made available globally.
-
-```html
-<script type="text/javascript" src="ethjs-provider-http.min.js"></script>
-<script type="text/javascript">
-new HttpProvider(...);
-</script>
-```
-
-Note, even though `ethjs` should have transformed and polyfilled most of the requirements to run this module across most modern browsers. You may want to look at an additional polyfill for extra support.
-
-Use a polyfill service such as `Polyfill.io` to ensure complete cross-browser support:
-https://polyfill.io/
 
 ## Latest Webpack Figures
 
@@ -70,8 +53,8 @@ Hash: 19a6a35da5b5795d31b4
 Version: webpack 2.1.0-beta.15
 Time: 777ms
                      Asset     Size  Chunks             Chunk Names
-    ethjs-provider-http.js  5.43 kB       0  [emitted]  main
-ethjs-provider-http.js.map   6.1 kB       0  [emitted]  main
+    ethjs-provider-ipc.js  5.43 kB       0  [emitted]  main
+ethjs-provider-ipc.js.map   6.1 kB       0  [emitted]  main
    [2] multi main 28 bytes {0} [built]
     + 2 hidden modules
 
@@ -79,7 +62,7 @@ Hash: 04c4c298f25fbf6d2da8
 Version: webpack 2.1.0-beta.15
 Time: 733ms
                      Asset     Size  Chunks             Chunk Names
-ethjs-provider-http.min.js  2.11 kB       0  [emitted]  main
+ethjs-provider-ipc.min.js  2.11 kB       0  [emitted]  main
    [2] multi main 28 bytes {0} [built]
     + 2 hidden modules
 ```

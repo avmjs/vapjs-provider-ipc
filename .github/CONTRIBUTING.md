@@ -1,6 +1,6 @@
-# Contributing to ethjs-provider-http
+# Contributing to ethjs-provider-ipc
 
-Love ethjs-provider-http and want to help? Thanks so much, there's something to do for everybody!
+Love ethjs-provider-ipc and want to help? Thanks so much, there's something to do for everybody!
 
 Please take a moment to review this document in order to make the contribution process easy and effective for everyone involved.
 
@@ -8,7 +8,7 @@ Following these guidelines helps to communicate that you respect the time of the
 
 ## Using the issue tracker
 
-The [issue tracker](https://github.com/ethjs/ethjs-provider-http/issues) is
+The [issue tracker](https://github.com/ethjs/ethjs-provider-ipc/issues) is
 the preferred channel for [bug reports](#bugs), [features requests](#features)
 and [submitting pull requests](#pull-requests).
 
@@ -76,11 +76,11 @@ included in the project:
 
    ```bash
    # Clone your fork of the repo into the current directory
-   git clone https://github.com/<your-username>/ethjs-provider-http.git
+   git clone https://github.com/<your-username>/ethjs-provider-ipc.git
    # Navigate to the newly cloned directory
-   cd ethjs-provider-http
+   cd ethjs-provider-ipc
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/ethjs/ethjs-provider-http.git
+   git remote add upstream https://github.com/ethjs/ethjs-provider-ipc.git
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -113,7 +113,7 @@ included in the project:
 7. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
     with a clear title and description.
 
-**DESIGN NOTE**: ethjs-provider-http follows the UNIX programming philosophy. Please consider this before contributing, keep your commits/modules concise and to the point.
+**DESIGN NOTE**: ethjs-provider-ipc follows the UNIX programming philosophy. Please consider this before contributing, keep your commits/modules concise and to the point.
 
 Read more here:
 http://www.catb.org/esr/writings/taoup/html/ch01s06.html
