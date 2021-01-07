@@ -82,7 +82,7 @@ var net = __webpack_require__(1);
  * InvalidResponseError helper for invalid errors.
  */
 function invalidResponseError(result, host) {
-  var message = !!result && !!result.error && !!result.error.message ? '[ethjs-provider-ipc] ' + result.error.message : '[ethjs-provider-ipc] Invalid JSON RPC response from host provider ' + host + ': ' + JSON.stringify(result, null, 2);
+  var message = !!result && !!result.error && !!result.error.message ? '[vapjs-provider-ipc] ' + result.error.message : '[vapjs-provider-ipc] Invalid JSON RPC response from host provider ' + host + ': ' + JSON.stringify(result, null, 2);
   return new Error(message);
 }
 
@@ -91,10 +91,10 @@ function invalidResponseError(result, host) {
  */
 function IpcProvider(path) {
   if (!(this instanceof IpcProvider)) {
-    throw new Error('[ethjs-provider-ipc] the IpcProvider instance requires the "new" flag in order to function normally (e.g. `const eth = new Eth(new IpcProvider());`).');
+    throw new Error('[vapjs-provider-ipc] the IpcProvider instance requires the "new" flag in order to function normally (e.g. `const vap = new Vap(new IpcProvider());`).');
   }
   if (typeof path !== 'string') {
-    throw new Error('[ethjs-provider-ipc] the IpcProvider instance requires that the path be specified (e.g. `/var/run/geth.ipc`)');
+    throw new Error('[vapjs-provider-ipc] the IpcProvider instance requires that the path be specified (e.g. `/var/run/gvap.ipc`)');
   }
 
   var self = this;
@@ -118,17 +118,17 @@ IpcProvider.prototype.sendAsync = function (payload, callback) {
       self.connection = net.connect(this.path);
     }
   } catch (error) {
-    callback(new Error('[ethjs-provider-ipc] CONNECTION ERROR: Couldn\'t connect to path \'' + self.path + '\': ' + JSON.stringify(error, null, 2)), null);
+    callback(new Error('[vapjs-provider-ipc] CONNECTION ERROR: Couldn\'t connect to path \'' + self.path + '\': ' + JSON.stringify(error, null, 2)), null);
   }
 
   self.connection.on('error', function (e) {
     console.error('IPC Connection Error', e); // eslint-disable-line
-    callback(new Error('[ethjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
+    callback(new Error('[vapjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
   });
 
   self.connection.on('end', function (e) {
     console.error('IPC Connection Closed', e); // eslint-disable-line
-    callback(new Error('[ethjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
+    callback(new Error('[vapjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
   });
 
   self.connection.on('data', function (data) {
@@ -181,4 +181,4 @@ module.exports = __webpack_require__(0);
 /******/ ])
 });
 ;
-//# sourceMappingURL=ethjs-provider-ipc.js.map
+//# sourceMappingURL=vapjs-provider-ipc.js.map

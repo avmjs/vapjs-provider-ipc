@@ -10,7 +10,7 @@ const net = require('net');
  * InvalidResponseError helper for invalid errors.
  */
 function invalidResponseError(result, host) {
-  const message = !!result && !!result.error && !!result.error.message ? `[ethjs-provider-ipc] ${result.error.message}` : `[ethjs-provider-ipc] Invalid JSON RPC response from host provider ${host}: ${JSON.stringify(result, null, 2)}`;
+  const message = !!result && !!result.error && !!result.error.message ? `[vapjs-provider-ipc] ${result.error.message}` : `[vapjs-provider-ipc] Invalid JSON RPC response from host provider ${host}: ${JSON.stringify(result, null, 2)}`;
   return new Error(message);
 }
 
@@ -18,8 +18,8 @@ function invalidResponseError(result, host) {
  * IpcProvider should be used to send rpc calls over UNIX sockets.
  */
 function IpcProvider(path) {
-  if (!(this instanceof IpcProvider)) { throw new Error('[ethjs-provider-ipc] the IpcProvider instance requires the "new" flag in order to function normally (e.g. `const eth = new Eth(new IpcProvider());`).'); }
-  if (typeof path !== 'string') { throw new Error('[ethjs-provider-ipc] the IpcProvider instance requires that the path be specified (e.g. `/var/run/geth.ipc`)'); }
+  if (!(this instanceof IpcProvider)) { throw new Error('[vapjs-provider-ipc] the IpcProvider instance requires the "new" flag in order to function normally (e.g. `const vap = new Vap(new IpcProvider());`).'); }
+  if (typeof path !== 'string') { throw new Error('[vapjs-provider-ipc] the IpcProvider instance requires that the path be specified (e.g. `/var/run/gvap.ipc`)'); }
 
   const self = this;
   self.path = path;
@@ -41,17 +41,17 @@ IpcProvider.prototype.sendAsync = function (payload, callback) { // eslint-disab
       self.connection = net.connect(this.path);
     }
   } catch (error) {
-    callback(new Error(`[ethjs-provider-ipc] CONNECTION ERROR: Couldn't connect to path '${self.path}': ${JSON.stringify(error, null, 2)}`), null);
+    callback(new Error(`[vapjs-provider-ipc] CONNECTION ERROR: Couldn't connect to path '${self.path}': ${JSON.stringify(error, null, 2)}`), null);
   }
 
   self.connection.on('error', e => {
     console.error('IPC Connection Error', e); // eslint-disable-line
-    callback(new Error('[ethjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
+    callback(new Error('[vapjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
   });
 
   self.connection.on('end', e => {
     console.error('IPC Connection Closed', e); // eslint-disable-line
-    callback(new Error('[ethjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
+    callback(new Error('[vapjs-provider-ipc] CONNECTION TIMEOUT: request timeout. (i.e. your connect has timed out for whatever reason, check your provider).'), null);
   });
 
   self.connection.on('data', data => {

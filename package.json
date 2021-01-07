@@ -1,5 +1,5 @@
 {
-  "name": "ethjs-provider-ipc",
+  "name": "vapjs-provider-ipc",
   "version": "0.0.1",
   "description": "A simple IPC provider that follows the web3 spec.",
   "main": "lib/index.js",
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/ethjs/ethjs-provider-ipc.git"
+    "url": "git+ssh://git@github.com/vapjs/vapjs-provider-ipc.git"
   },
   "babel": {
     "plugins": [
@@ -97,7 +97,7 @@
     }
   },
   "dependencies": {
-    "ethjs-provider-ipc": "^0.1.6"
+    "vapjs-provider-ipc": "^0.1.6"
   },
   "devDependencies": {
     "babel-cli": "6.18.0",
@@ -136,10 +136,10 @@
     "eslint-plugin-import": "1.8.0",
     "eslint-plugin-jsx-a11y": "1.2.0",
     "eslint-plugin-react": "5.1.1",
-    "eth-query": "2.1.0",
-    "ethereumjs-testrpc": "^3.0.2",
-    "ethjs-contract": "0.0.1",
-    "ethjs-query": "0.0.4",
+    "vap-query": "2.1.0",
+    "vaporyjs-testrpc": "^3.0.2",
+    "vapjs-contract": "0.0.1",
+    "vapjs-query": "0.0.4",
     "eventsource-polyfill": "0.9.6",
     "istanbul": "0.4.5",
     "json-loader": "0.5.4",
@@ -156,7 +156,7 @@
     "node": ">=6.5.0"
   },
   "keywords": [
-    "ethereum",
+    "vapory",
     "events",
     "rpc"
   ],
@@ -164,9 +164,9 @@
   "contributors": [],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ethjs/ethjs-provider-ipc/issues"
+    "url": "https://github.com/vapjs/vapjs-provider-ipc/issues"
   },
-  "homepage": "https://github.com/ethjs/ethjs-provider-ipc#readme",
+  "homepage": "https://github.com/vapjs/vapjs-provider-ipc#readme",
   "lint-staged": {
     "lint:eslint": "*.js"
   },

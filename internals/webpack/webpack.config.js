@@ -2,7 +2,7 @@ var webpack = require('webpack'); // eslint-disable-line
 var path = require('path');   // eslint-disable-line
 
 var env = process.env.NODE_ENV;   // eslint-disable-line
-var filename = 'ethjs-provider-ipc';      // eslint-disable-line
+var filename = 'vapjs-provider-ipc';      // eslint-disable-line
 var library = 'IpcProvider';          // eslint-disable-line
 var config = {                    // eslint-disable-line
   entry: [
